@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Study Planner</title>
+  <style>
+    /* Simple styles for beginners */
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef3ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      max-width: 550px;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px #00000015;
+    }
+    h1 { text-align: center; color: #273c75; }
+    p { text-align: center; color: #555; }
+    .form { display: flex; gap: 8px; flex-wrap: wrap; }
+    input {
+      flex: 1;
+      min-width: 160px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 15px;
+      background: #315fcb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button:hover { background: #244aa4; }
+    ul { list-style: none; padding: 0; }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-top: 8px;
+      background: #f4f6fb;
+      border-radius: 6px;
+    }
+    .task-text { overflow-wrap: anywhere; flex: 1; }
+    .done { text-decoration: line-through; color: gray; }
+    .task-buttons { display: flex; gap: 6px; }
+    .task-buttons button { padding: 8px 10px; }
+    .delete { background: #c0392b; }
+    .delete:hover { background: #922b21; }
+    #progress { font-weight: bold; margin-top: 22px; }
+    @media (max-width: 450px) {
+      .container { padding: 16px; }
+      .form { flex-direction: column; }
+      input { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 My Study Planner</h1>
+    <p>Keep track of your homework and assignments!</p>
+
+    <div class="form">
+      <input type="text" id="taskInput" placeholder="Enter an assignment" maxlength="100">
+      <button onclick="addTask()">Add Task</button>
+    </div>
+
+    <p id="message" role="status">Add your first assignment below.</p>
+    <ul id="taskList"></ul>
+    <p id="progress">Completed: 0 of 0 (0%)</p>
+  </div>
+
+  <script>
+    // Store assignments in an array.
+    let tasks = [];
+
+    // Add a new assignment.
+    function addTask() {
+      let input = document.getElementById("taskInput");
+      let name = input.value.trim();
+
+      if (name === "") {
+        document.getElementById("message").textContent = "Please enter an assignment first.";
+        return;
+      }
+
+      tasks.push({ name: name, completed: false });
+      input.value = "";
+      document.getElementById("message").textContent = "Task added!";
+      showTasks();
+    }
+
+    // Mark an assignment as finished or unfinished.
+    function completeTask(index) {
+      tasks[index].completed = !tasks[index].completed;
+      document.getElementById("message").textContent = "Progress updated!";
+      showTasks();
+    }
+
+    // Delete an assignment.
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      document.getElementById("message").textContent = "Task deleted.";
+      showTasks();
+    }
+
+    // Display assignments and update the progress count.
+    function showTasks() {
+      let list = document.getElementById("taskList");
+      list.innerHTML = "";
+      let completed = 0;
+
+      tasks.forEach(function(task, index) {
+        if (task.completed) completed++;
+
+        let item = document.createElement("li");
+        let name = document.createElement("span");
+        name.className = task.completed ? "task-text done" : "task-text";
+        name.textContent = task.name;
+
+        let buttons = document.createElement("div");
+        buttons.className = "task-buttons";
+        let doneButton = document.createElement("button");
+        doneButton.textContent = task.completed ? "Undo" : "Done";
+        doneButton.onclick = function() { completeTask(index); };
+
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "delete";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() { deleteTask(index); };
+
+        buttons.appendChild(doneButton);
+        buttons.appendChild(deleteButton);
+        item.appendChild(name);
+        item.appendChild(buttons);
+        list.appendChild(item);
+      });
+
+      let percent = tasks.length === 0 ? 0 : Math.round(completed / tasks.length * 100);
+      document.getElementById("progress").textContent =
+        "Completed: " + completed + " of " + tasks.length + " (" + percent + "%)";
+    }
+
+    // Let users press Enter to add a task.
+    document.getElementById("taskInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") addTask();
+    });
+  </script>
+</body>
+</html>
